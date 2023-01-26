@@ -67,38 +67,49 @@ class Me extends EndpointPaging {
 
   /// Get tracks from the current user’s recently played tracks.
   /// Note: Currently doesn’t support podcast episodes.
-  CursorPages<PlayHistory> recentlyPlayed({int? limit, DateTime? after, DateTime? before}) {
+  CursorPages<PlayHistory> recentlyPlayed(
+      {int? limit, DateTime? after, DateTime? before}) {
     assert(after == null || before == null,
-      'Cannot specify both after and before.');
+        'Cannot specify both after and before.');
 
-    return _getCursorPages('$_path/player/recently-played?' +
-        _buildQuery({
-          'limit': limit,
-          'after': after?.millisecondsSinceEpoch,
-          'before': before?.millisecondsSinceEpoch
-        }), (json) => PlayHistory.fromJson(json));
+    return _getCursorPages(
+        '$_path/player/recently-played?' +
+            _buildQuery({
+              'limit': limit,
+              'after': after?.millisecondsSinceEpoch,
+              'before': before?.millisecondsSinceEpoch
+            }),
+        (json) => PlayHistory.fromJson(json));
   }
 
   /// Get the current user's top tracks.
-  /// @param limit: the maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.
-  /// @param offset: The index of the first item to return. Default: 0 (the first item). Use with limit to get the next set of items.
-  /// @param time_range: Over what time frame the affinities are computed (long_term, medium_term, short_term)
-  /// For more information, see https://developer.spotify.com/documentation/web-api/reference/#/operations/get-users-top-artists-and-tracks
-  Future<Iterable<Track>> topTracks(int limit, int offset, String timeRange) async {
-    final jsonString = await _api._get('$_path/top/tracks?time_range=$timeRange&limit=$limit&offset=$offset');
+  /// [limit] - the maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.\
+  /// [offset] - The index of the first item to return. Default: 0 (the first item). Use with limit to get the next set of items.\
+  /// [timeRange] - Over what time frame the affinities are computed (long_term, medium_term, short_term)\
+  /// For more information See https://developer.spotify.com/documentation/web-api/reference/#/operations/get-users-top-artists-and-tracks
+  Future<Iterable<Track>> topTracks(
+      {int limit = 20,
+      int offset = 0,
+      String timeRange = 'medium_term'}) async {
+    final jsonString = await _api._get(
+        '$_path/top/tracks?time_range=$timeRange&limit=$limit&offset=$offset');
     final map = json.decode(jsonString);
 
     final items = map['items'] as Iterable<dynamic>;
     return items.map((item) => Track.fromJson(item));
   }
 
-  /// Get the current user's top artists.
-  /// @param limit: the maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.
-  /// @param offset: The index of the first item to return. Default: 0 (the first item). Use with limit to get the next set of items.
-  /// @param time_range: Over what time frame the affinities are computed (long_term, medium_term, short_term)
+  /// Get the current user's top artists.\
+  /// [limit] - the maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.\
+  /// [offset] - The index of the first item to return. Default: 0 (the first item). Use with limit to get the next set of items.\
+  /// [timeRange] - Over what time frame the affinities are computed (long_term, medium_term, short_term)\
   /// For more information See https://developer.spotify.com/documentation/web-api/reference/#/operations/get-users-top-artists-and-tracks
-  Future<Iterable<Artist>> topArtists(int limit, int offset, String timeRange) async {
-    final jsonString = await _api._get('$_path/top/artists?time_range=$timeRange&limit=$limit&offset=$offset');
+  Future<Iterable<Artist>> topArtists(
+      {int limit = 20,
+      int offset = 0,
+      String timeRange = 'medium_term'}) async {
+    final jsonString = await _api._get(
+        '$_path/top/artists?time_range=$timeRange&limit=$limit&offset=$offset');
     final map = json.decode(jsonString);
 
     final items = map['items'] as Iterable<dynamic>;
